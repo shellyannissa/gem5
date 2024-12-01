@@ -693,3 +693,12 @@ class PIFPrefetcher(QueuedPrefetcher):
         self.addEvent(
             HWPProbeEventRetiredInsts(self, simObj, "RetiredInstsPC")
         )
+
+
+class ContextBasedPrefetcher(QueuedPrefetcher):
+    type = 'ContextBasedPrefetcher'
+    cxx_class = 'gem5::prefetch::ContextBasedPrefetcher'
+    cxx_header = "mem/cache/prefetch/context_based_prefetcher.hh"
+
+    prefetch_window = Param.Int(16, "Prefetch window size")
+    target_prefetch_distance = Param.Int(30, "Target prefetch distance")
