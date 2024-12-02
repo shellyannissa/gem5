@@ -65,12 +65,15 @@ int
 ContextBasedPrefetcher::hash(int context) const
 {
     // Simple hash function
-    return context % 1024;
+    return context % 4096;
 }
 
 void
 ContextBasedPrefetcher::addToState(int key, Addr addr)
 {
+    if (states.find(key) == states.end()) {
+        states[key] = State();
+    }
     states[key].ptrs[addr] = 0;
     states[key].counter = globalCounter; // Record the current global counter value
 }
@@ -108,7 +111,7 @@ ContextBasedPrefetcher::sendPrefetch(std::vector<AddrPriority> &addresses)
         Addr next_pref = prefetchQueue.front().addr;
         prefetchQueue.pop_front();
         addresses.push_back(AddrPriority(next_pref, 0));
-        DPRINTF(HWPrefetch, "Generated prefetch %#lx\n", next_pref);
+        DPRINTF(HWPrefetch, "Generated prefetch %#lcontextx\n", next_pref);
     }
 }
 
