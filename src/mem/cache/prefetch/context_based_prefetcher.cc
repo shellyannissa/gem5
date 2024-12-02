@@ -65,13 +65,18 @@ int
 ContextBasedPrefetcher::hash(int context) const
 {
     // Simple hash function
-    return context % 1024;
+    return context % 8192;
 }
 
 void
 ContextBasedPrefetcher::addToState(int key, Addr addr)
 {
-    states[key].ptrs[addr] = 0;
+    if (states.find(key) == states.end()) {
+        states[key] = State();
+    }
+    if (states[key].ptrs.find(addr) == states[key].ptrs.end()) {
+        states[key].ptrs[addr] = 0;
+    }
     states[key].counter = globalCounter; // Record the current global counter value
 }
 
