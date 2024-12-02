@@ -22,10 +22,23 @@ class RewardFunction
 
     int operator()(int distance) const
     {
-        // Bell-shaped reward function centered around targetDistance
-        double sigma = windowSize / 2.0;
-        double exponent = -std::pow(distance - targetDistance, 2) / (2 * std::pow(sigma, 2));
-        return static_cast<int>(std::exp(exponent) * 100); // Scale the reward
+
+        double a = 4.0;    // Height of the peak
+        double b = targetDistance;   // Position of the peak
+        double c = 10.0;   // Width of the peak
+
+        // Parameters for the exponential tail
+        double d = 1;   // Exponential decay factor
+        double e = 100.0;   // Decay rate
+
+        // Gaussian-like peak term
+        double peak = a * exp(-pow(distance - b, 2) / (2 * c * c));
+
+        // Exponential decay term
+        double decay = -d * exp(distance / e);
+
+        // Total reward
+        return int((peak + decay) * 100);
     }
 
   private:
