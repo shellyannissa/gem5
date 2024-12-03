@@ -25,7 +25,7 @@ class RewardFunction
 
         double a = 4.0;    // Height of the peak
         double b = targetDistance;   // Position of the peak
-        double c = 10.0;   // Width of the peak
+        double c = 20.0;   // Width of the peak
 
         // Parameters for the exponential tail
         double d = 1;   // Exponential decay factor
@@ -38,7 +38,7 @@ class RewardFunction
         double decay = -d * exp(distance / e);
 
         // Total reward
-        return int((peak + decay) * 100);
+        return int((peak + decay) * 20);
     }
 
   private:
