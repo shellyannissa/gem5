@@ -42,7 +42,7 @@ fontsize=14;
 label="cpu \n: X86AtomicSimpleCPU";
 shape=box;
 style="rounded, filled";
-tooltip="branchPred&#61;Null&#10;\checker&#61;Null&#10;\clk_domain&#61;system.cpu_clk_domain&#10;\cpu_id&#61;0&#10;\decoder&#61;system.cpu.decoder&#10;\do_checkpoint_insts&#61;true&#10;\do_statistics_insts&#61;true&#10;\eventq_index&#61;0&#10;\function_trace&#61;false&#10;\function_trace_start&#61;0&#10;\interrupts&#61;system.cpu.interrupts&#10;\isa&#61;system.cpu.isa&#10;\max_insts_all_threads&#61;0&#10;\max_insts_any_thread&#61;1000&#10;\mmu&#61;system.cpu.mmu&#10;\numThreads&#61;1&#10;\power_gating_on_idle&#61;false&#10;\power_model&#61;&#10;\power_state&#61;system.cpu.power_state&#10;\progress_interval&#61;0&#10;\pwr_gating_latency&#61;300&#10;\simpoint_start_insts&#61;&#10;\simulate_data_stalls&#61;false&#10;\simulate_inst_stalls&#61;false&#10;\socket_id&#61;0&#10;\switched_out&#61;false&#10;\syscallRetryLatency&#61;10000&#10;\system&#61;system&#10;\tracer&#61;system.cpu.tracer&#10;\width&#61;1&#10;\workload&#61;system.cpu.workload";
+tooltip="branchPred&#61;Null&#10;\checker&#61;Null&#10;\clk_domain&#61;system.cpu_clk_domain&#10;\cpu_id&#61;0&#10;\decoder&#61;system.cpu.decoder&#10;\do_checkpoint_insts&#61;true&#10;\do_statistics_insts&#61;true&#10;\eventq_index&#61;0&#10;\function_trace&#61;false&#10;\function_trace_start&#61;0&#10;\interrupts&#61;system.cpu.interrupts&#10;\isa&#61;system.cpu.isa&#10;\max_insts_all_threads&#61;0&#10;\max_insts_any_thread&#61;100000&#10;\mmu&#61;system.cpu.mmu&#10;\numThreads&#61;1&#10;\power_gating_on_idle&#61;false&#10;\power_model&#61;&#10;\power_state&#61;system.cpu.power_state&#10;\progress_interval&#61;0&#10;\pwr_gating_latency&#61;300&#10;\simpoint_start_insts&#61;&#10;\simulate_data_stalls&#61;false&#10;\simulate_inst_stalls&#61;false&#10;\socket_id&#61;0&#10;\switched_out&#61;false&#10;\syscallRetryLatency&#61;10000&#10;\system&#61;system&#10;\tracer&#61;system.cpu.tracer&#10;\width&#61;1&#10;\workload&#61;system.cpu.workload";
 system_cpu_icache_port [color="#000000", fillcolor="#959ead", fontcolor="#000000", fontname=Arial, fontsize=14, label=icache_port, shape=box, style="rounded, filled"];
 system_cpu_dcache_port [color="#000000", fillcolor="#959ead", fontcolor="#000000", fontname=Arial, fontsize=14, label=dcache_port, shape=box, style="rounded, filled"];
 subgraph cluster_system_cpu_mmu {
@@ -176,7 +176,7 @@ fontsize=14;
 label="workload \n: Process";
 shape=box;
 style="rounded, filled";
-tooltip="cmd&#61;/home/dhwanish/Documents/Benchmarks/benchspec/CPU2006/401.bzip2/exe/bzip2_base.gcc43-64bit /home/dhwanish/Documents/Benchmarks/benchspec/CPU2006/401.bzip2/data/ref/input/input.source 280&#10;\cwd&#61;/media/dhwanish/backup/Documents/Programming/gem5-prefetcher&#10;\drivers&#61;&#10;\egid&#61;100&#10;\env&#61;&#10;\errout&#61;cerr&#10;\euid&#61;100&#10;\eventq_index&#61;0&#10;\executable&#61;/home/dhwanish/Documents/Benchmarks/benchspec/CPU2006/401.bzip2/exe/bzip2_base.gcc43-64bit&#10;\gid&#61;1000&#10;\input&#61;cin&#10;\kvmInSE&#61;false&#10;\maxStackSize&#61;67108864&#10;\output&#61;cout&#10;\pgid&#61;100&#10;\pid&#61;100&#10;\ppid&#61;0&#10;\release&#61;5.1.0&#10;\simpoint&#61;0&#10;\system&#61;system&#10;\uid&#61;100&#10;\useArchPT&#61;false";
+tooltip="cmd&#61;./ll&#10;\cwd&#61;/media/dhwanish/backup/Documents/Programming/gem5-prefetcher&#10;\drivers&#61;&#10;\egid&#61;100&#10;\env&#61;&#10;\errout&#61;cerr&#10;\euid&#61;100&#10;\eventq_index&#61;0&#10;\executable&#61;./ll&#10;\gid&#61;1000&#10;\input&#61;cin&#10;\kvmInSE&#61;false&#10;\maxStackSize&#61;67108864&#10;\output&#61;cout&#10;\pgid&#61;100&#10;\pid&#61;100&#10;\ppid&#61;0&#10;\release&#61;5.1.0&#10;\simpoint&#61;0&#10;\system&#61;system&#10;\uid&#61;100&#10;\useArchPT&#61;false";
 }
 
 subgraph cluster_system_cpu_isa {
@@ -692,10 +692,10 @@ fillcolor="#9f9c95";
 fontcolor="#000000";
 fontname=Arial;
 fontsize=14;
-label="prefetcher \n: ContextBasedPrefetcher";
+label="prefetcher \n: BOPPrefetcher";
 shape=box;
 style="rounded, filled";
-tooltip="block_size&#61;64&#10;\cache_snoop&#61;false&#10;\clk_domain&#61;system.cpu_clk_domain&#10;\eventq_index&#61;0&#10;\latency&#61;1&#10;\max_prefetch_requests_with_pending_translation&#61;32&#10;\on_data&#61;true&#10;\on_inst&#61;true&#10;\on_miss&#61;false&#10;\on_read&#61;true&#10;\on_write&#61;true&#10;\page_bytes&#61;4096&#10;\power_model&#61;&#10;\power_state&#61;system.l2.prefetcher.power_state&#10;\prefetch_on_access&#61;false&#10;\prefetch_on_pf_hit&#61;true&#10;\prefetch_window&#61;32&#10;\queue_filter&#61;true&#10;\queue_size&#61;32&#10;\queue_squash&#61;true&#10;\sys&#61;system&#10;\tag_prefetch&#61;true&#10;\target_prefetch_distance&#61;30&#10;\throttle_control_percentage&#61;0&#10;\use_virtual_addresses&#61;false";
+tooltip="bad_score&#61;10&#10;\block_size&#61;64&#10;\cache_snoop&#61;false&#10;\clk_domain&#61;system.cpu_clk_domain&#10;\delay_queue_cycles&#61;60&#10;\delay_queue_enable&#61;true&#10;\delay_queue_size&#61;15&#10;\eventq_index&#61;0&#10;\latency&#61;1&#10;\max_prefetch_requests_with_pending_translation&#61;32&#10;\negative_offsets_enable&#61;true&#10;\offset_list_size&#61;46&#10;\on_data&#61;true&#10;\on_inst&#61;true&#10;\on_miss&#61;false&#10;\on_read&#61;true&#10;\on_write&#61;true&#10;\page_bytes&#61;4096&#10;\power_model&#61;&#10;\power_state&#61;system.l2.prefetcher.power_state&#10;\prefetch_on_access&#61;false&#10;\prefetch_on_pf_hit&#61;true&#10;\queue_filter&#61;true&#10;\queue_size&#61;32&#10;\queue_squash&#61;true&#10;\round_max&#61;100&#10;\rr_size&#61;64&#10;\score_max&#61;31&#10;\sys&#61;system&#10;\tag_bits&#61;12&#10;\tag_prefetch&#61;true&#10;\throttle_control_percentage&#61;0&#10;\use_virtual_addresses&#61;false";
 subgraph cluster_system_l2_prefetcher_power_state {
 color="#000000";
 fillcolor="#84827c";
@@ -808,7 +808,7 @@ fontsize=14;
 label="redirect_paths0 \n: RedirectPath";
 shape=box;
 style="rounded, filled";
-tooltip="app_path&#61;/proc&#10;\eventq_index&#61;0&#10;\host_paths&#61;stats/bzip2/context/fs/proc";
+tooltip="app_path&#61;/proc&#10;\eventq_index&#61;0&#10;\host_paths&#61;stats/linked_list/bop/fs/proc";
 }
 
 subgraph cluster_system_redirect_paths1 {
@@ -820,7 +820,7 @@ fontsize=14;
 label="redirect_paths1 \n: RedirectPath";
 shape=box;
 style="rounded, filled";
-tooltip="app_path&#61;/sys&#10;\eventq_index&#61;0&#10;\host_paths&#61;stats/bzip2/context/fs/sys";
+tooltip="app_path&#61;/sys&#10;\eventq_index&#61;0&#10;\host_paths&#61;stats/linked_list/bop/fs/sys";
 }
 
 subgraph cluster_system_redirect_paths2 {
@@ -832,7 +832,7 @@ fontsize=14;
 label="redirect_paths2 \n: RedirectPath";
 shape=box;
 style="rounded, filled";
-tooltip="app_path&#61;/tmp&#10;\eventq_index&#61;0&#10;\host_paths&#61;stats/bzip2/context/fs/tmp";
+tooltip="app_path&#61;/tmp&#10;\eventq_index&#61;0&#10;\host_paths&#61;stats/linked_list/bop/fs/tmp";
 }
 
 subgraph cluster_system_workload {
@@ -856,7 +856,7 @@ fontsize=14;
 label="switch_cpus \n: X86TimingSimpleCPU";
 shape=box;
 style="rounded, filled";
-tooltip="branchPred&#61;Null&#10;\checker&#61;Null&#10;\clk_domain&#61;system.cpu_clk_domain&#10;\cpu_id&#61;0&#10;\decoder&#61;system.switch_cpus.decoder&#10;\do_checkpoint_insts&#61;true&#10;\do_statistics_insts&#61;true&#10;\eventq_index&#61;0&#10;\function_trace&#61;false&#10;\function_trace_start&#61;0&#10;\interrupts&#61;&#10;\isa&#61;system.cpu.isa&#10;\max_insts_all_threads&#61;0&#10;\max_insts_any_thread&#61;500000&#10;\mmu&#61;system.switch_cpus.mmu&#10;\numThreads&#61;1&#10;\power_gating_on_idle&#61;false&#10;\power_model&#61;&#10;\power_state&#61;system.switch_cpus.power_state&#10;\progress_interval&#61;0&#10;\pwr_gating_latency&#61;300&#10;\simpoint_start_insts&#61;&#10;\socket_id&#61;0&#10;\switched_out&#61;true&#10;\syscallRetryLatency&#61;10000&#10;\system&#61;system&#10;\tracer&#61;system.switch_cpus.tracer&#10;\workload&#61;system.cpu.workload";
+tooltip="branchPred&#61;Null&#10;\checker&#61;Null&#10;\clk_domain&#61;system.cpu_clk_domain&#10;\cpu_id&#61;0&#10;\decoder&#61;system.switch_cpus.decoder&#10;\do_checkpoint_insts&#61;true&#10;\do_statistics_insts&#61;true&#10;\eventq_index&#61;0&#10;\function_trace&#61;false&#10;\function_trace_start&#61;0&#10;\interrupts&#61;&#10;\isa&#61;system.cpu.isa&#10;\max_insts_all_threads&#61;0&#10;\max_insts_any_thread&#61;50000000&#10;\mmu&#61;system.switch_cpus.mmu&#10;\numThreads&#61;1&#10;\power_gating_on_idle&#61;false&#10;\power_model&#61;&#10;\power_state&#61;system.switch_cpus.power_state&#10;\progress_interval&#61;0&#10;\pwr_gating_latency&#61;300&#10;\simpoint_start_insts&#61;&#10;\socket_id&#61;0&#10;\switched_out&#61;true&#10;\syscallRetryLatency&#61;10000&#10;\system&#61;system&#10;\tracer&#61;system.switch_cpus.tracer&#10;\workload&#61;system.cpu.workload";
 subgraph cluster_system_switch_cpus_mmu {
 color="#000000";
 fillcolor="#bab6ae";
@@ -1000,7 +1000,7 @@ fontsize=14;
 label="switch_cpus_1 \n: X86O3CPU";
 shape=box;
 style="rounded, filled";
-tooltip="LFSTSize&#61;1024&#10;\LQEntries&#61;32&#10;\LSQCheckLoads&#61;true&#10;\LSQDepCheckShift&#61;4&#10;\SQEntries&#61;32&#10;\SSITSize&#61;1024&#10;\activity&#61;0&#10;\backComSize&#61;5&#10;\branchPred&#61;system.switch_cpus_1.branchPred&#10;\cacheLoadPorts&#61;200&#10;\cacheStorePorts&#61;200&#10;\checker&#61;Null&#10;\clk_domain&#61;system.cpu_clk_domain&#10;\commitToDecodeDelay&#61;1&#10;\commitToFetchDelay&#61;1&#10;\commitToIEWDelay&#61;1&#10;\commitToRenameDelay&#61;1&#10;\commitWidth&#61;8&#10;\cpu_id&#61;0&#10;\decodeToFetchDelay&#61;1&#10;\decodeToRenameDelay&#61;1&#10;\decodeWidth&#61;8&#10;\decoder&#61;system.switch_cpus_1.decoder&#10;\dispatchWidth&#61;8&#10;\do_checkpoint_insts&#61;true&#10;\do_statistics_insts&#61;true&#10;\eventq_index&#61;0&#10;\fetchBufferSize&#61;64&#10;\fetchQueueSize&#61;32&#10;\fetchToDecodeDelay&#61;1&#10;\fetchTrapLatency&#61;1&#10;\fetchWidth&#61;8&#10;\forwardComSize&#61;5&#10;\fuPool&#61;system.switch_cpus_1.fuPool&#10;\function_trace&#61;false&#10;\function_trace_start&#61;0&#10;\iewToCommitDelay&#61;1&#10;\iewToDecodeDelay&#61;1&#10;\iewToFetchDelay&#61;1&#10;\iewToRenameDelay&#61;1&#10;\interrupts&#61;&#10;\isa&#61;system.cpu.isa&#10;\issueToExecuteDelay&#61;1&#10;\issueWidth&#61;8&#10;\max_insts_all_threads&#61;0&#10;\max_insts_any_thread&#61;5000000&#10;\mmu&#61;system.switch_cpus_1.mmu&#10;\needsTSO&#61;true&#10;\numIQEntries&#61;64&#10;\numPhysCCRegs&#61;1280&#10;\numPhysFloatRegs&#61;256&#10;\numPhysIntRegs&#61;256&#10;\numPhysMatRegs&#61;2&#10;\numPhysVecPredRegs&#61;32&#10;\numPhysVecRegs&#61;256&#10;\numROBEntries&#61;192&#10;\numRobs&#61;1&#10;\numThreads&#61;1&#10;\power_gating_on_idle&#61;false&#10;\power_model&#61;&#10;\power_state&#61;system.switch_cpus_1.power_state&#10;\progress_interval&#61;0&#10;\pwr_gating_latency&#61;300&#10;\renameToDecodeDelay&#61;1&#10;\renameToFetchDelay&#61;1&#10;\renameToIEWDelay&#61;2&#10;\renameToROBDelay&#61;1&#10;\renameWidth&#61;8&#10;\simpoint_start_insts&#61;&#10;\smtCommitPolicy&#61;RoundRobin&#10;\smtFetchPolicy&#61;RoundRobin&#10;\smtIQPolicy&#61;Partitioned&#10;\smtIQThreshold&#61;100&#10;\smtLSQPolicy&#61;Partitioned&#10;\smtLSQThreshold&#61;100&#10;\smtNumFetchingThreads&#61;1&#10;\smtROBPolicy&#61;Partitioned&#10;\smtROBThreshold&#61;100&#10;\socket_id&#61;0&#10;\squashWidth&#61;8&#10;\store_set_clear_period&#61;250000&#10;\switched_out&#61;true&#10;\syscallRetryLatency&#61;10000&#10;\system&#61;system&#10;\tracer&#61;system.switch_cpus_1.tracer&#10;\trapLatency&#61;13&#10;\wbWidth&#61;8&#10;\workload&#61;system.cpu.workload";
+tooltip="LFSTSize&#61;1024&#10;\LQEntries&#61;32&#10;\LSQCheckLoads&#61;true&#10;\LSQDepCheckShift&#61;4&#10;\SQEntries&#61;32&#10;\SSITSize&#61;1024&#10;\activity&#61;0&#10;\backComSize&#61;5&#10;\branchPred&#61;system.switch_cpus_1.branchPred&#10;\cacheLoadPorts&#61;200&#10;\cacheStorePorts&#61;200&#10;\checker&#61;Null&#10;\clk_domain&#61;system.cpu_clk_domain&#10;\commitToDecodeDelay&#61;1&#10;\commitToFetchDelay&#61;1&#10;\commitToIEWDelay&#61;1&#10;\commitToRenameDelay&#61;1&#10;\commitWidth&#61;8&#10;\cpu_id&#61;0&#10;\decodeToFetchDelay&#61;1&#10;\decodeToRenameDelay&#61;1&#10;\decodeWidth&#61;8&#10;\decoder&#61;system.switch_cpus_1.decoder&#10;\dispatchWidth&#61;8&#10;\do_checkpoint_insts&#61;true&#10;\do_statistics_insts&#61;true&#10;\eventq_index&#61;0&#10;\fetchBufferSize&#61;64&#10;\fetchQueueSize&#61;32&#10;\fetchToDecodeDelay&#61;1&#10;\fetchTrapLatency&#61;1&#10;\fetchWidth&#61;8&#10;\forwardComSize&#61;5&#10;\fuPool&#61;system.switch_cpus_1.fuPool&#10;\function_trace&#61;false&#10;\function_trace_start&#61;0&#10;\iewToCommitDelay&#61;1&#10;\iewToDecodeDelay&#61;1&#10;\iewToFetchDelay&#61;1&#10;\iewToRenameDelay&#61;1&#10;\interrupts&#61;&#10;\isa&#61;system.cpu.isa&#10;\issueToExecuteDelay&#61;1&#10;\issueWidth&#61;8&#10;\max_insts_all_threads&#61;0&#10;\max_insts_any_thread&#61;50000000&#10;\mmu&#61;system.switch_cpus_1.mmu&#10;\needsTSO&#61;true&#10;\numIQEntries&#61;64&#10;\numPhysCCRegs&#61;1280&#10;\numPhysFloatRegs&#61;256&#10;\numPhysIntRegs&#61;256&#10;\numPhysMatRegs&#61;2&#10;\numPhysVecPredRegs&#61;32&#10;\numPhysVecRegs&#61;256&#10;\numROBEntries&#61;192&#10;\numRobs&#61;1&#10;\numThreads&#61;1&#10;\power_gating_on_idle&#61;false&#10;\power_model&#61;&#10;\power_state&#61;system.switch_cpus_1.power_state&#10;\progress_interval&#61;0&#10;\pwr_gating_latency&#61;300&#10;\renameToDecodeDelay&#61;1&#10;\renameToFetchDelay&#61;1&#10;\renameToIEWDelay&#61;2&#10;\renameToROBDelay&#61;1&#10;\renameWidth&#61;8&#10;\simpoint_start_insts&#61;&#10;\smtCommitPolicy&#61;RoundRobin&#10;\smtFetchPolicy&#61;RoundRobin&#10;\smtIQPolicy&#61;Partitioned&#10;\smtIQThreshold&#61;100&#10;\smtLSQPolicy&#61;Partitioned&#10;\smtLSQThreshold&#61;100&#10;\smtNumFetchingThreads&#61;1&#10;\smtROBPolicy&#61;Partitioned&#10;\smtROBThreshold&#61;100&#10;\socket_id&#61;0&#10;\squashWidth&#61;8&#10;\store_set_clear_period&#61;250000&#10;\switched_out&#61;true&#10;\syscallRetryLatency&#61;10000&#10;\system&#61;system&#10;\tracer&#61;system.switch_cpus_1.tracer&#10;\trapLatency&#61;13&#10;\wbWidth&#61;8&#10;\workload&#61;system.cpu.workload";
 subgraph cluster_system_switch_cpus_1_mmu {
 color="#000000";
 fillcolor="#bab6ae";
