@@ -152,7 +152,7 @@ Base::StatGroup::StatGroup(statistics::Group *parent)
         "number of late prefetches (hitting in cache, MSHR or WB)")
 {
     using namespace statistics;
-
+ 
     pfUnused.flags(nozero);
 
     accuracy.flags(total);
