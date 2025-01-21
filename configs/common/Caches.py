@@ -50,7 +50,7 @@ from gem5.isas import ISA
 
 
 class L1Cache(Cache):
-    assoc = 2
+    assoc = 8
     tag_latency = 2
     data_latency = 2
     response_latency = 2
@@ -69,13 +69,14 @@ class L1_DCache(L1Cache):
 
 
 class L2Cache(Cache):
-    assoc = 8
+    assoc = 16
     tag_latency = 20
     data_latency = 20
     response_latency = 20
     mshrs = 20
     tgts_per_mshr = 12
     write_buffers = 8
+    prefetcher = BOPPrefetcher()
 
 
 class IOCache(Cache):

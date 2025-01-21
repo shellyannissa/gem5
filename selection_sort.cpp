@@ -49,8 +49,8 @@ void printList(Node* node) {
 int main() {
     Node* head = nullptr;
     std::srand(std::time(0));
-    for (int i = 0; i < 100; ++i) {
-        append(&head, std::rand() % 1000);
+    for (int i = 0; i < 10; ++i) {
+        append(&head, std::rand() % 10000);
     }
 
     std::cout << "Unsorted list: ";
