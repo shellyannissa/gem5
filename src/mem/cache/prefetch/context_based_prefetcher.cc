@@ -65,7 +65,7 @@ int
 ContextBasedPrefetcher::hash(int context) const
 {
     // Simple hash function
-    return context % 4096;
+    return context % 8192;
 }
 
 void
@@ -110,7 +110,7 @@ ContextBasedPrefetcher::sendPrefetch(std::vector<AddrPriority> &addresses)
     if (!prefetchQueue.empty()) {
         Addr next_pref = prefetchQueue.front().addr;
         prefetchQueue.pop_front();
-        addresses.push_back(AddrPriority(next_pref, 0));
+        addresses.push_back(AddrPriority(next_pref, 3));
         DPRINTF(HWPrefetch, "Generated prefetch %#lcontextx\n", next_pref);
     }
 }

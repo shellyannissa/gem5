@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 # Filepath to the log file
-log_file_path = '/home/abishek/Desktop/SHELLY/gem5/eda/addresses.log'
+log_file_path = './eda/addresses.log'
 
 # Specify the start and end index of lines to be considered
 start_index = 1000
