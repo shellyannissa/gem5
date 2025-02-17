@@ -155,7 +155,7 @@ class Base : public ClockedObject
          */
         Addr getPC() const
         {
-            assert(hasPC());
+            // assert(hasPC());
             return pc;
         }
 

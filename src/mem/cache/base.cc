@@ -138,11 +138,27 @@ BaseCache::BaseCache(const BaseCacheParams &p, unsigned blk_size)
         "Compressed cache %s does not have a compression algorithm", name());
     if (compressor)
         compressor->setCache(this);
+
+    logFile.open("/home/abishek/Desktop/SHELLY/gem5/eda/addr_pc.log");
+    if (!logFile.is_open()) {
+        fatal("Unable to open log file: /home/abishek/Desktop/SHELLY/gem5/eda/addr_pc.log");
+    }
 }
 
 BaseCache::~BaseCache()
 {
     delete tempBlock;
+
+    // Close the log file
+    if (logFile.is_open()) {
+        logFile.close();
+    }
+}
+
+void
+BaseCache::logAccess(PacketPtr pkt)
+{
+    
 }
 
 void
@@ -1244,6 +1260,7 @@ BaseCache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
 {
     // sanity check
     assert(pkt->isRequest());
+    logAccess(pkt);
 
     gem5_assert(!(isReadOnly && pkt->isWrite()),
                 "Should never see a write in a read-only cache %s\n",

@@ -76,6 +76,7 @@
 #include "sim/serialize.hh"
 #include "sim/sim_exit.hh"
 #include "sim/system.hh"
+#include "cpu/thread_context.hh"
 
 namespace gem5
 {
@@ -119,6 +120,11 @@ class BaseCache : public ClockedObject
         Blocked_NoTargets,
         NUM_BLOCKED_CAUSES
     };
+
+  private:
+    void logAccess(PacketPtr pkt); // New method to log accesses
+
+    std::ofstream logFile; // New attribute to store the log file
 
   protected:
 
