@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <deque>
 #include <vector>
+#include <fstream>
 #include "mem/cache/prefetch/queued.hh"
 
 namespace gem5
@@ -23,9 +24,17 @@ class RewardFunction
     int operator()(int distance) const
     {
         // Bell-shaped reward function centered around targetDistance
-        double sigma = windowSize / 2.0;
-        double exponent = -std::pow(distance - targetDistance, 2) / (2 * std::pow(sigma, 2));
-        return static_cast<int>(std::exp(exponent) * 100); // Scale the reward
+        double sigma = 10;
+        double center = 30;
+        double exponent = -std::pow(distance - center, 2) / (2 * std::pow(sigma, 2));
+        int reward = static_cast<int>(std::exp(exponent) * 100);
+
+        // Make rewards negative towards the extreme ends
+        if (distance < center - 2 * sigma || distance > center + 2 * sigma) {
+            reward = -reward * 20;  // Increased penalty for incorrect predictions
+        }
+
+        return reward;
     }
 
   private:
@@ -47,29 +56,37 @@ class ContextBasedPrefetcher : public Queued
 
   private:
     struct State {
-        std::unordered_map<Addr, int> ptrs;
-        int counter; // Single counter for the context
+        std::unordered_map<Addr, int> ptrs; // Pointers to addresses
+        int counter; // Counter for the context
     };
 
     struct PrefetchEntry {
-        Addr addr;
-        int key;
-        int index;
+        Addr addr; // Prefetch address
+        int key;  // Context key
+        int index; // Index in the prefetch queue
     };
 
-    int prefetchWindow;
-    RewardFunction rewardFunction;
-    std::unordered_map<int, State> states;
-    std::deque<Addr> previousAccesses;
-    std::deque<PrefetchEntry> prefetchQueue;
+    int prefetchWindow; // Size of the prefetch window
+    RewardFunction rewardFunction; // Reward function
+    std::unordered_map<int, State> states; // States for each context
+    std::deque<Addr> previousAccesses; // Previous accesses for context
+    std::deque<PrefetchEntry> prefetchQueue; // Prefetch queue
+    std::vector<int> mostSeenOffsets; // List of most seen offsets
+    int rewardThreshold; // Reward threshold for prefetching
+    int confidenceThreshold; // Confidence threshold for prefetching
+    std::vector<int> rewards; // Track rewards for dynamic threshold adjustment
+    std::unordered_map<int, int> offsetFrequencies; // Track frequencies of offsets
 
-    static int globalCounter; // Global counter to track memory accesses
+    int hash(Addr addr, int pc) const; // Hash function for context
+    void addToState(int key, Addr addr); // Add address to state
+    Addr getBestAddress(int key) const; // Get the best address for a context
+    void updateScores(Addr addr); // Update scores based on prefetch queue
+    void updatePreviousAccesses(Addr addr); // Update previous accesses
+    std::vector<int> getMostSeenOffsets() const; // Get most seen offsets
+    void updateRewardThreshold(); // Update the reward threshold dynamically
+    void updateOffsets(); // Update offsets dynamically
 
-    int hash(int context) const;
-    void addToState(int key, Addr addr);
-    Addr getBestAddress(int key) const;
-    void updateScores(Addr addr);
-    void sendPrefetch(std::vector<AddrPriority> &addresses);
+    std::ofstream logFile; // File stream for logging
 };
 
 } // namespace prefetch
