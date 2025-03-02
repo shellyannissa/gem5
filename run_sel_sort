@@ -1,8 +1,36 @@
-build/X86/gem5.opt -d stats/sort/bop \
+#!/bin/bash
+
+# declare variable for storing path given as argument
+path=$1
+prefetcher=""
+
+# check if path is given as argument
+if [ "$path" = "context" ]
+then
+    prefetcher="ContextBasedPrefetcher"
+elif [ "$path" = "stride" ]
+then
+    prefetcher="StridePrefetcher"
+elif [ "$path" = "tagged" ]
+then
+    prefetcher="TaggedPrefetcher"
+elif [ "$path" = "signature" ]
+then
+    prefetcher="SignaturePathPrefetcher"
+elif [ "$path" = "indirect" ]
+then
+    prefetcher="IndirectMemoryPrefetcher"
+else
+    echo "Invalid argument"
+    exit 1
+fi
+
+
+build/X86/gem5.opt -d stats/sort/${path} \
 configs/deprecated/example/se.py \
 --cpu-type=DerivO3CPU --sys-clock=3GHz \
---caches --l1i_size=32kB --l1d_size=32kB --l1d-hwp-type=ContextBasedPrefetcher \
+--caches --l1i_size=32kB --l1d_size=32kB --l1d-hwp-type=${prefetcher} \
 --l2cache --l2_size=256kB  \
 --bp-type=TAGE_SC_L_8KB \
 --mem-size=4GB --mem-type=DDR3_1600_8x8 -F 500000 -s 100000 -W 500000 -I 5000000 \
--c /home/abishek/Desktop/SHELLY/gem5/selection_sort
+-c ./selection_sort

@@ -76,7 +76,7 @@ ContextBasedPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
     updateRewardThreshold();
 
     // Update offsets dynamically
-    // updateOffsets();
+    updateOffsets();
 }
 
 void
