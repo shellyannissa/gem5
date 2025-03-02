@@ -21,15 +21,21 @@ with open(log_file_path, 'r') as file:
             requester_ids.append(requester_id)
             times.append(i)  # Use the line number as the time
 
-# Create a colormap with bright colors
-cmap = cm.get_cmap('tab10', 4)  # 10 distinct bright colors
+# Create a colormap with 16 distinct colors
+colors = [
+    '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', 
+    '#00FFFF', '#800000', '#008000', '#000080', '#808000',
+    '#800080', '#808080', '#C0C0C0', '#FFA500', '#A52A2A', 
+    '#8A2BE2'
+]
+cmap = lambda i: colors[i % len(colors)]
 
 # Plot the addresses as a time series with different colors for each requester ID
 plt.figure(figsize=(10, 6))
-for requester_id in [0, 13, 14, 15]:
+for requester_id in range(16):
     indices = [i for i, rid in enumerate(requester_ids) if rid == requester_id]
     plt.plot([times[i] for i in indices], [addresses[i] for i in indices], 
-             color=cmap(requester_id % 13), label=f'Requester ID {requester_id}', marker='o', markersize=5)
+             color=cmap(requester_id), label=f'Requester ID {requester_id}', marker='o', markersize=5)
 
 plt.xlabel('Time')
 plt.ylabel('Address')
