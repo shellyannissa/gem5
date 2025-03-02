@@ -1,8 +1,38 @@
-build/X86/gem5.opt -d stats/mcf/context \
+#!/bin/bash
+
+# declare variable for storing path given as argument
+path=$1
+prefetcher=""
+
+# check if path is given as argument
+if [ "$path" = "context" ]
+then
+    prefetcher="ContextBasedPrefetcher"
+elif [ "$path" = "stride" ]
+then
+    prefetcher="StridePrefetcher"
+elif [ "$path" = "tagged" ]
+then
+    prefetcher="TaggedPrefetcher"
+elif [ "$path" = "signature" ]
+then
+    prefetcher="SignaturePathPrefetcher"
+elif [ "$path" = "indirect" ]
+then
+    prefetcher="IndirectMemoryPrefetcher"
+else
+    echo "Invalid argument"
+    exit 1
+fi
+
+# read a file named home and store it in a variable
+home=$(cat home)
+
+build/X86/gem5.opt -d stats/mcf/${path} \
 configs/deprecated/example/se.py \
---cpu-type=X86MinorCPU --sys-clock=3GHz \
+--cpu-type=DerivO3CPU --sys-clock=3GHz \
 --caches --l1i_size=32kB --l1d_size=64kB \
---l2cache --l2_size=2MB --l2-hwp-type=ContextBasedPrefetcher \
---mem-size=2GB --mem-type=DDR3_1600_8x8 -F 100000 -s 200000 -W 5000000 -I 5000000 \
--c /home/dhwanish/Documents/Benchmarks/benchspec/CPU2006/429.mcf/exe/mcf_base.gcc43-64bit \
--o "/home/dhwanish/Documents/Benchmarks/benchspec/CPU2006/429.mcf/data/ref/input/inp.in"
+--l2cache --l2_size=2MB --l2-hwp-type=${prefetcher} \
+--mem-size=2GB --mem-type=DDR3_1600_8x8 -F 100000 -s 200000 -W 5000000 -I 10000000 \
+-c ${home}/benchspec/CPU2006/429.mcf/exe/mcf_base.gcc43-64bit \
+-o "${home}/benchspec/CPU2006/429.mcf/data/ref/input/inp.in"
