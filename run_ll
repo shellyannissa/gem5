@@ -19,7 +19,7 @@ then
     prefetcher="SignaturePathPrefetcher"
 elif [ "$path" = "indirect" ]
 then
-    prefetcher="indirectMemoryPrefetcher"
+    prefetcher="IndirectMemoryPrefetcher"
 else
     echo "Invalid argument"
     exit 1
