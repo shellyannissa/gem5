@@ -77,12 +77,12 @@ int main() {
     srand(time(0));
 
     // Generate a random linked list
-    int n = 1000;
+    int n = 100000;
     Node* head = NULL;
     generateRandomLinkedList(&head, n);
 
     // random operations
-    for (int i = 0; i < n * 300; i++) {
+    for (int i = 0; i < n; i++) {
         int operation = rand() % 4;
         int data = rand() % 100000;
         switch (operation) {
