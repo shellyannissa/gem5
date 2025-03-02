@@ -87,13 +87,13 @@ class ContextBasedPrefetcher : public Queued
 
     int hash(Addr addr) const; // Hash function for context
     void addToState(int key, Addr addr, int index); // Add address to state
-    std::vector<Addr> getPrefetches(int key) ; // Get the best addresses for a context
+    std::vector<Addr> getPrefetches(int key, Addr baseAddr); // Get the best addresses for a context
     void updateScores(Addr addr); // Update scores based on prefetch queue
     void updatePreviousAccesses(Addr addr); // Update previous accesses
     std::vector<int> getMostSeenOffsets() const; // Get most seen offsets
     void updateRewardThreshold(); // Update the reward threshold dynamically
     void updateOffsets(); // Update offsets dynamically
-
+    bool isPrefetchCrossingPageBoundary(Addr addr, int offset) const; // Check if prefetch crosses page boundary
 };
 
 } // namespace prefetch
