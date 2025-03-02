@@ -28,7 +28,7 @@ ContextBasedPrefetcher::ContextBasedPrefetcher(const ContextBasedPrefetcherParam
     // Seed the random number generator
     std::srand(std::time(nullptr));
     mostProbableOffsets = { 64, 128, 256, 512, 1024, 2048, 4096};
-    mostSeenOffsets = { 128, 1024};
+    mostSeenOffsets = { 64, 1024};
    
 }
 
@@ -60,7 +60,7 @@ ContextBasedPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
 
     // Prediction: Get the best addresses for the current context
     if (states.find(key) != states.end()) {
-        std::vector<Addr> best_addrs = getPrefetches(key);
+        std::vector<Addr> best_addrs = getPrefetches(key, addr);
         for (const auto &best_addr : best_addrs) {
             prefetchQueue.push_back({best_addr, key, (int)prefetchQueue.size()});
             addresses.push_back(AddrPriority(best_addr, 0));
@@ -107,7 +107,7 @@ ContextBasedPrefetcher::addToState(int key, Addr addr, int index)
 }
 
 std::vector<Addr>
-ContextBasedPrefetcher::getPrefetches(int key) 
+ContextBasedPrefetcher::getPrefetches(int key, Addr baseAddr) 
 {
     const auto &ptrs = states.at(key).ptrs;
     std::vector<Addr> best_addrs;
@@ -122,14 +122,25 @@ ContextBasedPrefetcher::getPrefetches(int key)
 
     auto temp_ptrs = ptrs; // Copy the heap to a temporary variable
     int degree = 0;
-
     while (!temp_ptrs.empty() && degree < 2) {
         auto top = temp_ptrs.top();
-        if ((explore && top.first < confidenceThreshold) || (!explore && top.first > confidenceThreshold)) {
+        temp_ptrs.pop();
+        if (isPrefetchCrossingPageBoundary(baseAddr, top.second - baseAddr)) {
+            continue; // Skip addresses that cross page boundaries
+        }
+        if (explore) {
+            if (top.first < confidenceThreshold) { 
+                best_addrs.push_back(top.second);
+                degree++;
+                break; // Exit the loop after pushing one address
+            }
+        } else {
+            if (top.first < confidenceThreshold) {
+                break; // Exit the loop if confidence value is less than the threshold
+            }
             best_addrs.push_back(top.second);
             degree++;
         }
-        temp_ptrs.pop();
     }
 
     return best_addrs;
@@ -181,7 +192,7 @@ ContextBasedPrefetcher::updateRewardThreshold()
 {
     if (rewardCounter > 0) {
         int mean_reward = cumulativeReward / rewardCounter;
-        rewardThreshold = mean_reward * 1.5; // Adjust multiplier as needed
+        rewardThreshold = mean_reward * 1; // Adjust multiplier as needed
     }
 }
 
@@ -213,5 +224,14 @@ ContextBasedPrefetcher::updateOffsets()
     }
 }
 
+bool
+ContextBasedPrefetcher::isPrefetchCrossingPageBoundary(Addr addr, int offset) const
+{
+    const int pageSize = 4096; // 4KB page size
+    Addr startPage = addr & ~(pageSize - 1);
+    Addr endPage = (addr + offset) & ~(pageSize - 1);
+    return startPage != endPage;
+}
+
 } // namespace prefetch
-} // namespace gem5 
+} // namespace gem5
