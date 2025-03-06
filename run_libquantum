@@ -30,16 +30,19 @@ run() {
         path="none"
     fi
 
-    build/X86/gem5.opt -d stats/sort_ll/${path} \
+    # read a file named home and store it in a variable
+    home=$(cat home)
+
+    build/X86/gem5.opt -d stats/libquantum/${path} \
     configs/deprecated/example/se.py \
     --cpu-type=DerivO3CPU --sys-clock=3GHz \
     --caches --l1i_size=32kB --l1d_size=64kB \
     --l2cache --l2_size=2MB ${hwp}${prefetcher} \
-    --mem-size=4GB --mem-type=DDR3_1600_8x8 -F 100000 -s 200000 -W 500000 -I 10000000 \
-    -c ./sort_ll
+    --mem-size=4GB --mem-type=DDR3_1600_8x8 -F 10000 -s 20000 -W 50000 -I 5000000 \
+    -c ${home}/benchspec/CPU2006/462.libquantum/exe/libquantum_base.gcc43-64bit \
+    -o "1397 8"
 }
 
-# Call the function with the argument
 run
 
 run context
@@ -53,3 +56,4 @@ run tagged
 run signature
 
 run indirect
+
