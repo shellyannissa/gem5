@@ -187,7 +187,7 @@ Stride::calculatePrefetch(const PrefetchInfo &pfi,
             addresses.push_back(AddrPriority(new_addr, 0));
         }
     } else {
-        // Miss in table
+    // Miss in table
         DPRINTF(HWPrefetch, "Miss: PC %x pkt_addr %x (%s)\n", pc, pf_addr,
                 is_secure ? "s" : "ns");
 
