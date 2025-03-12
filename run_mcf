@@ -1,38 +1,59 @@
 #!/bin/bash
 
-# declare variable for storing path given as argument
-path=$1
-prefetcher=""
+run() {
+    # declare variable for storing path given as argument
+    path=$1
+    prefetcher=""
+    hwp="--l2-hwp-type="
 
-# check if path is given as argument
-if [ "$path" = "context" ]
-then
-    prefetcher="ContextBasedPrefetcher"
-elif [ "$path" = "stride" ]
-then
-    prefetcher="StridePrefetcher"
-elif [ "$path" = "tagged" ]
-then
-    prefetcher="TaggedPrefetcher"
-elif [ "$path" = "signature" ]
-then
-    prefetcher="SignaturePathPrefetcher"
-elif [ "$path" = "indirect" ]
-then
-    prefetcher="IndirectMemoryPrefetcher"
-else
-    echo "Invalid argument"
-    exit 1
-fi
+    # check if path is given as argument
+    if [ "$path" = "context" ]
+    then
+        prefetcher="ContextBasedPrefetcher"
+    elif [ "$path" = "bop" ]
+    then
+        prefetcher="BOPPrefetcher"
+    elif [ "$path" = "stride" ]
+    then
+        prefetcher="StridePrefetcher"
+    elif [ "$path" = "tagged" ]
+    then
+        prefetcher="TaggedPrefetcher"
+    elif [ "$path" = "signature" ]
+    then
+        prefetcher="SignaturePathPrefetcher"
+    elif [ "$path" = "indirect" ]
+    then
+        prefetcher="IndirectMemoryPrefetcher"
+    else
+        hwp=""
+        path="none"
+    fi
 
-# read a file named home and store it in a variable
-home=$(cat home)
+    # read a file named home and store it in a variable
+    home=$(cat home)
 
-build/X86/gem5.opt -d stats/mcf/${path} \
-configs/deprecated/example/se.py \
---cpu-type=DerivO3CPU --sys-clock=3GHz \
---caches --l1i_size=32kB --l1d_size=64kB \
---l2cache --l2_size=2MB --l2-hwp-type=${prefetcher} \
---mem-size=2GB --mem-type=DDR3_1600_8x8 -F 100000 -s 200000 -W 5000000 -I 10000000 \
--c ${home}/benchspec/CPU2006/429.mcf/exe/mcf_base.gcc43-64bit \
--o "${home}/benchspec/CPU2006/429.mcf/data/ref/input/inp.in"
+    build/X86/gem5.opt -d stats/mcf/${path} \
+    configs/deprecated/example/se.py \
+    --cpu-type=DerivO3CPU --sys-clock=3GHz \
+    --caches --l1i_size=32kB --l1d_size=64kB \
+    --l2cache --l2_size=2MB ${hwp}${prefetcher} \
+    --mem-size=4GB --mem-type=DDR3_1600_8x8 -F 100000 -s 200000 -W 5000000 -I 10000000 \
+    -c ${home}/benchspec/CPU2006/429.mcf/exe/mcf_base.gcc43-64bit \
+    -o "${home}/benchspec/CPU2006/429.mcf/data/ref/input/inp.in"
+}
+
+run
+
+run context
+
+run bop
+
+run stride
+
+run tagged
+
+run signature
+
+run indirect
+

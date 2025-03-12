@@ -1,34 +1,49 @@
 #!/bin/bash
 
-# declare variable for storing path given as argument
-path=$1
-prefetcher=""
+run() {
+    # declare variable for storing path given as argument
+    path=$1
+    prefetcher=""
+    hwp="--l2-hwp-type="
 
-# check if path is given as argument
-if [ "$path" = "context" ]
-then
-    prefetcher="ContextBasedPrefetcher"
-elif [ "$path" = "stride" ]
-then
-    prefetcher="StridePrefetcher"
-elif [ "$path" = "tagged" ]
-then
-    prefetcher="TaggedPrefetcher"
-elif [ "$path" = "signature" ]
-then
-    prefetcher="SignaturePathPrefetcher"
-elif [ "$path" = "indirect" ]
-then
-    prefetcher="IndirectMemoryPrefetcher"
-else
-    echo "Invalid argument"
-    exit 1
-fi
+    # check if path is given as argument
+    if [ "$path" = "context" ]; then
+        prefetcher="ContextBasedPrefetcher"
+    elif [ "$path" = "bop" ]; then
+        prefetcher="BOPPrefetcher"
+    elif [ "$path" = "stride" ]; then
+        prefetcher="StridePrefetcher"
+    elif [ "$path" = "tagged" ]; then
+        prefetcher="TaggedPrefetcher"
+    elif [ "$path" = "signature" ]; then
+        prefetcher="SignaturePathPrefetcher"
+    elif [ "$path" = "indirect" ]; then
+        prefetcher="IndirectMemoryPrefetcher"
+    else
+        hwp=""
+        path="none"
+    fi
 
-build/X86/gem5.opt -d stats/test/${path} \
-configs/deprecated/example/se.py \
---cpu-type=X86MinorCPU --sys-clock=3GHz \
---caches --l1i_size=32kB --l1d_size=64kB \
---l2cache --l2_size=2MB --l2-hwp-type=${prefetcher} \
---mem-size=2GB --mem-type=DDR3_1600_8x8 -F 10000 -s 20000 -W 50000 -I 1000000 \
--c ./test
+    build/X86/gem5.opt -d stats/test/${path} \
+    configs/deprecated/example/se.py \
+    --cpu-type=DerivO3CPU --sys-clock=3GHz \
+    --caches --l1i_size=32kB --l1d_size=64kB \
+    --l2cache --l2_size=2MB ${hwp}${prefetcher} \
+    --mem-size=4GB --mem-type=DDR3_1600_8x8 -F 10000 -s 20000 -W 50000 -I 5000000 \
+    -c ./test
+}
+
+# Call the function with the argument
+run
+
+run context
+
+run bop
+
+run stride
+
+run tagged
+
+run signature
+
+run indirect

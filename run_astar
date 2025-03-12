@@ -33,14 +33,14 @@ run() {
     # read a file named home and store it in a variable
     home=$(cat home)
 
-    build/X86/gem5.opt -d stats/bzip2_l1/${path} \
+    build/X86/gem5.opt -d stats/astar/${path} \
     configs/deprecated/example/se.py \
     --cpu-type=DerivO3CPU --sys-clock=3GHz \
     --caches --l1i_size=32kB --l1d_size=64kB \
     --l2cache --l2_size=2MB ${hwp}${prefetcher} \
-    --mem-size=4GB --mem-type=DDR3_1600_8x8 -F 10000 -s 20000 -W 50000 -I 500000 \
-    -c ${home}/benchspec/CPU2006/401.bzip2/exe/bzip2_base.gcc43-64bit \
-    -o "${home}/benchspec/CPU2006/401.bzip2/data/ref/input/input.source 280"
+    --mem-size=4GB --mem-type=DDR3_1600_8x8 -F 10000 -s 20000 -W 50000 -I 1500000 \
+    -c ${home}/benchspec/CPU2006/473.astar/exe/astar_base.gcc43-64bit \
+    -o "${home}/benchspec/CPU2006/473.astar/data/ref/input/rivers.cfg"
 }
 
 run
