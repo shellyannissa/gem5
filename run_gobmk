@@ -33,7 +33,7 @@ run() {
     # read a file named home and store it in a variable
     home=$(cat home)
 
-    build/X86/gem5.opt -d stats/gobmk_l1/${path} \
+    build/X86/gem5.opt -d stats/gobmk/${path} \
     configs/deprecated/example/se.py \
     --cpu-type=DerivO3CPU --sys-clock=3GHz \
     --caches --l1i_size=32kB --l1d_size=64kB \

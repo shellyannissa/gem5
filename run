@@ -1,0 +1,21 @@
+./run_astar context
+
+./run_bzip2 context
+
+./run_sel_sort context
+
+./run_test  context
+
+./run_gobmk context
+
+./run_lbm context
+
+./run_mcf   context
+
+./run_libquantum context
+
+./run_ll    context
+
+./run_namd context
+
+./run_omnetpp context
