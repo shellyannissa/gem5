@@ -43,17 +43,32 @@ run() {
     -o "--quiet --mode gtp ${home}/benchspec/CPU2006/445.gobmk/data/ref/input/13x13.tst"
 }
 
-run
+# check if no arguments are given
+if [ "$#" -eq 0 ]
+then
+    echo "Running all"
+    run
+    run context
+    run bop
+    run stride
+    run tagged
+    run signature
+    run indirect
+    exit 0
+fi
 
-run context
-
-run bop
-
-run stride
-
-run tagged
-
-run signature
-
-run indirect
-
+# run all arguments given
+for arg in "$@"
+do
+    if [ "$arg" = "context" ] || [ "$arg" = "bop" ] || [ "$arg" = "stride" ] || [ "$arg" = "tagged" ] || [ "$arg" = "signature" ] || [ "$arg" = "indirect" ]
+    then
+        echo "Running $arg"
+        run $arg
+    elif [ "$arg" = "none"]
+    then
+        echo "Running none"
+        run
+    else
+        echo "Invalid argument: $arg"
+    fi
+done
