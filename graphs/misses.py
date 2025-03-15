@@ -1,8 +1,11 @@
+# import output.json file
+import json
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-# import list called data from data.py
-from data import data
+with open("output.json", "r") as file:
+    data = json.load(file)
 
 # Extract benchmark names and prefetcher names
 benchmarks = [benchmark["name"] for benchmark in data]
