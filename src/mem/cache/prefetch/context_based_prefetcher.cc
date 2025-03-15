@@ -128,42 +128,42 @@ ContextBasedPrefetcher::getPrefetches(int key, Addr baseAddr)
     int degree = 0;
 
     // generate a vector of addresses sorted by confidence value in descending order
-    std::vector<std::pair<Addr, int>> sorted_ptrs(ptrs.begin(), ptrs.end());
-    std::sort(sorted_ptrs.begin(), sorted_ptrs.end(), [](const auto &a, const auto &b) {
-        return a.second > b.second;
-    });
+    // std::vector<std::pair<Addr, int>> sorted_ptrs(ptrs.begin(), ptrs.end());
+    // std::sort(sorted_ptrs.begin(), sorted_ptrs.end(), [](const auto &a, const auto &b) {
+    //     return a.second > b.second;
+    // });
 
-    for (auto ptr = sorted_ptrs.begin(); ptr != sorted_ptrs.end() && degree < 2; ++ptr) {
-        if (isPrefetchCrossingPageBoundary(baseAddr, ptr->first - baseAddr)) {
-            continue; // Skip addresses that cross page boundaries
-        }
-        if (explore) {
-            best_addrs.push_back(ptr->first);
-            degree++;
-        } else {
-            if (ptr->second < confidenceThreshold) {
-                break; // Exit the loop if confidence value is less than the threshold
-            }
-            best_addrs.push_back(ptr->first);
-            degree++;
-        }
-    }
-
-    // for (auto it = ptrs.rbegin(); it != ptrs.rend() && degree < 2; ++it) {
-    //     if (isPrefetchCrossingPageBoundary(baseAddr, it->first - baseAddr)) {
+    // for (auto ptr = sorted_ptrs.begin(); ptr != sorted_ptrs.end() && degree < 2; ++ptr) {
+    //     if (isPrefetchCrossingPageBoundary(baseAddr, ptr->first - baseAddr)) {
     //         continue; // Skip addresses that cross page boundaries
     //     }
     //     if (explore) {
-    //         best_addrs.push_back(it->first);
+    //         best_addrs.push_back(ptr->first);
     //         degree++;
     //     } else {
-    //         if (it->second < confidenceThreshold) {
+    //         if (ptr->second < confidenceThreshold) {
     //             break; // Exit the loop if confidence value is less than the threshold
     //         }
-    //         best_addrs.push_back(it->first);
+    //         best_addrs.push_back(ptr->first);
     //         degree++;
     //     }
     // }
+
+    for (auto it = ptrs.rbegin(); it != ptrs.rend() && degree < 2; ++it) {
+        if (isPrefetchCrossingPageBoundary(baseAddr, it->first - baseAddr)) {
+            continue; // Skip addresses that cross page boundaries
+        }
+        if (explore) {
+            best_addrs.push_back(it->first);
+            degree++;
+        } else {
+            if (it->second < confidenceThreshold) {
+                break; // Exit the loop if confidence value is less than the threshold
+            }
+            best_addrs.push_back(it->first);
+            degree++;
+        }
+    }
     return best_addrs;
 }
 
