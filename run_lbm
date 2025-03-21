@@ -43,17 +43,33 @@ run() {
     -o "300 reference.dat 0 0 ${home}/benchspec/CPU2006/470.lbm/data/ref/input/100_100_130_ldc.of"
 }
 
-run
 
-run context
+# check if no arguments are given
+if [ "$#" -eq 0 ]
+then
+    echo "Running all"
+    run
+    run context
+    run bop
+    run stride
+    run tagged
+    run signature
+    run indirect
+    exit 0
+fi
 
-run bop
-
-run stride
-
-run tagged
-
-run signature
-
-run indirect
-
+# run all arguments given
+for arg in "$@"
+do
+    if [ "$arg" = "context" ] || [ "$arg" = "bop" ] || [ "$arg" = "stride" ] || [ "$arg" = "tagged" ] || [ "$arg" = "signature" ] || [ "$arg" = "indirect" ]
+    then
+        echo "Running $arg"
+        run $arg
+    elif [ "$arg" = "none"]
+    then
+        echo "Running none"
+        run
+    else
+        echo "Invalid argument: $arg"
+    fi
+done

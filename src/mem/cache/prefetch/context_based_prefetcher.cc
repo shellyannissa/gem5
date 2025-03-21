@@ -27,7 +27,7 @@ ContextBasedPrefetcher::ContextBasedPrefetcher(const ContextBasedPrefetcherParam
 {
     // Seed the random number generator
     std::srand(std::time(nullptr));
-    mostProbableOffsets = { 64, 128, 256, 512, 1024, 2048, 4096};
+    mostProbableOffsets = { 64, 128, 256, 512, 1024, 2048};
     mostSeenOffsets = { 64, 1024};
    
 }
@@ -42,12 +42,16 @@ ContextBasedPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
 
     // Data collection: Update state with previous accesses
     for (size_t i = 0; i < previousAccesses.size(); ++i) {
-        if( i % 40 != 0) {
-            continue;
-        }
         Addr a = previousAccesses[i];
         int prev_key = hash(a);
         addToState(prev_key, addr, i);
+        if (i == previousAccesses.size() - 1) {
+            int offset = addr - previousAccesses[i];
+            Addr target_addr = addr + offset;
+            rewardCounter++;
+            cumulativeReward += rewardFunction(30);
+            states[hash(addr)].ptrs[target_addr] += rewardFunction(30);
+        }
     }
 
     for (int offset : mostSeenOffsets) {
@@ -55,7 +59,7 @@ ContextBasedPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
         int reward = rewardFunction(30);
         cumulativeReward += reward;
         rewardCounter++;
-        states[hash(addr)].ptrs.push({reward, target_addr});
+        states[hash(addr)].ptrs[target_addr] += reward;
     }
 
     // Prediction: Get the best addresses for the current context
@@ -69,6 +73,7 @@ ContextBasedPrefetcher::calculatePrefetch(const PrefetchInfo &pfi,
 
     // Feedback: Update scores based on prefetch queue
     updateScores(addr);
+
     // Update previous accesses
     updatePreviousAccesses(addr);
 
@@ -103,7 +108,7 @@ ContextBasedPrefetcher::addToState(int key, Addr addr, int index)
     int reward = rewardFunction(index);
     cumulativeReward += reward;
     rewardCounter++;
-    states[key].ptrs.push({reward, addr});
+    states[key].ptrs[addr] += reward;
 }
 
 std::vector<Addr>
@@ -120,29 +125,45 @@ ContextBasedPrefetcher::getPrefetches(int key, Addr baseAddr)
     double random_value = static_cast<double>(std::rand()) / RAND_MAX;
     bool explore = random_value < 0.2; // Explore with 20% probability
 
-    auto temp_ptrs = ptrs; // Copy the heap to a temporary variable
     int degree = 0;
-    while (!temp_ptrs.empty() && degree < 2) {
-        auto top = temp_ptrs.top();
-        temp_ptrs.pop();
-        if (isPrefetchCrossingPageBoundary(baseAddr, top.second - baseAddr)) {
+
+    // generate a vector of addresses sorted by confidence value in descending order
+    // std::vector<std::pair<Addr, int>> sorted_ptrs(ptrs.begin(), ptrs.end());
+    // std::sort(sorted_ptrs.begin(), sorted_ptrs.end(), [](const auto &a, const auto &b) {
+    //     return a.second > b.second;
+    // });
+
+    // for (auto ptr = sorted_ptrs.begin(); ptr != sorted_ptrs.end() && degree < 2; ++ptr) {
+    //     if (isPrefetchCrossingPageBoundary(baseAddr, ptr->first - baseAddr)) {
+    //         continue; // Skip addresses that cross page boundaries
+    //     }
+    //     if (explore) {
+    //         best_addrs.push_back(ptr->first);
+    //         degree++;
+    //     } else {
+    //         if (ptr->second < confidenceThreshold) {
+    //             break; // Exit the loop if confidence value is less than the threshold
+    //         }
+    //         best_addrs.push_back(ptr->first);
+    //         degree++;
+    //     }
+    // }
+
+    for (auto it = ptrs.rbegin(); it != ptrs.rend() && degree < 2; ++it) {
+        if (isPrefetchCrossingPageBoundary(baseAddr, it->first - baseAddr)) {
             continue; // Skip addresses that cross page boundaries
         }
         if (explore) {
-            if (top.first < confidenceThreshold) { 
-                best_addrs.push_back(top.second);
-                degree++;
-                break; // Exit the loop after pushing one address
-            }
+            best_addrs.push_back(it->first);
+            degree++;
         } else {
-            if (top.first < confidenceThreshold) {
+            if (it->second < confidenceThreshold) {
                 break; // Exit the loop if confidence value is less than the threshold
             }
-            best_addrs.push_back(top.second);
+            best_addrs.push_back(it->first);
             degree++;
         }
     }
-
     return best_addrs;
 }
 
@@ -160,7 +181,7 @@ ContextBasedPrefetcher::updateScores(Addr addr)
             int reward = rewardFunction(distance);
             cumulativeReward += reward;
             rewardCounter++;
-            states[it->key].ptrs.push({reward, addr});
+            states[it->key].ptrs[addr] += reward;
             ++it; // Move iterator to the next element to continue searching
         }
     }
@@ -201,7 +222,7 @@ ContextBasedPrefetcher::updateOffsets()
 {
     // Update the most seen offsets based on observed frequencies
     std::unordered_map<int, int> offset_count;
-    for (size_t i = 0; i < previousAccesses.size(); i += 10) { // Traverse through every 10th element
+    for (size_t i = 0; i < previousAccesses.size(); i++) { // Traverse through every 10th element
         Addr addr = previousAccesses[i];
         for (const auto &offset : mostProbableOffsets) {
             Addr target_addr = addr + offset;

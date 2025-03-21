@@ -63,7 +63,7 @@ class ContextBasedPrefetcher : public Queued
 
   private:
     struct State {
-        std::priority_queue<std::pair<int, Addr>> ptrs; // Heap for pointers to addresses
+        std::map<Addr, int> ptrs; // Map for pointers to addresses
         int counter; // Counter for the context
     };
 
