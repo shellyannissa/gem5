@@ -3,12 +3,14 @@ import json
 
 import matplotlib.pyplot as plt
 import numpy as np
+from avg import get_average
 
 with open("output.json", "r") as file:
     data = json.load(file)
 
 # Extract benchmark names and prefetcher names
 benchmarks = [benchmark["name"] for benchmark in data]
+benchmarks.append("average")
 prefetcher_names = [prefetcher["name"] for prefetcher in data[0]["prefetchers"]]
 
 # Extract accuracy data
@@ -16,6 +18,9 @@ accuracy_data = {prefetcher: [] for prefetcher in prefetcher_names}
 for benchmark in data:
     for prefetcher in benchmark["prefetchers"]:
         accuracy_data[prefetcher["name"]].append(prefetcher["accuracy"])
+
+for prefetcher in benchmark["prefetchers"]:
+    accuracy_data[prefetcher["name"]].append(get_average(prefetcher["name"], "accuracy"))
 
 # Plotting
 x = np.arange(len(benchmarks))  # the label locations

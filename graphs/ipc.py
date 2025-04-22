@@ -3,12 +3,14 @@ import json
 
 import matplotlib.pyplot as plt
 import numpy as np
+from avg import get_average
 
 with open("output.json", "r") as file:
     data = json.load(file)
 
 # Extract benchmark names and prefetcher names
 benchmarks = [benchmark["name"] for benchmark in data]
+benchmarks.append("average")
 prefetcher_names = [prefetcher["name"] for prefetcher in data[0]["prefetchers"]]
 
 # Extract ipc data and normalize with base ipc
@@ -18,6 +20,10 @@ for benchmark in data:
     for prefetcher in benchmark["prefetchers"]:
         normalized_ipc = prefetcher["ipc"] / base_ipc
         ipc_data[prefetcher["name"]].append(normalized_ipc)
+
+# Add average ipc for each prefetcher
+for prefetcher in benchmark["prefetchers"]:
+    ipc_data[prefetcher["name"]].append(get_average(prefetcher["name"], "ipc") / benchmark["base"]["ipc"])
 
 # Plotting
 x = np.arange(len(benchmarks))  # the label locations
