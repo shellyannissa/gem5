@@ -1,3 +1,229 @@
+# Version 24.1.0.3
+
+**[HOTFIX]** This hotfix release adds `#import <algorithm>` to "src/base/random.cc" to fix a compilation error affecting some systems (compilation error: "‘remove_if’ is not a member of ‘std’.").
+
+# Version 24.1.0.2
+
+**[HOTFIX]** Adds PR <https://github.com/gem5/gem5/pull/1930> as a hotfix to v24.1.0.
+
+This fixes a bug which was was causing the CHI coherence protocol to fail in multi-core simulations.
+The fix sets the `RubySystem` pointer when the TBE is allocated, instead of when `set_tbe` is performed, thus ensuring that the `RubySystem` pointer is set before the TBE is used.
+
+# Version 24.1.0.1
+
+**[HOTFIX]** This hotfix release applies the following:
+
+* Generalization of the class types in CHI RNF/MN generators thus fixing an issue with missing attributes when using the CHI protocol.
+PR: <https://github.com/gem5/gem5/pull/1851>.
+* Add Sphinx documentation for the gem5 standard library.
+This is largely generated from Python docstrings.
+See "docs/README" for more information on building and deploying Sphinx documentation.
+PR: <https://github.com/gem5/gem5/pull/335>.
+* Add missing `RubySystem` member and related methods in `PerfectCacheMemory`'s entries.
+This was causing assertions to trigger in "src/mem/ruby/commonNetDest.cc".
+PR: <https://github.com/gem5/gem5/pull/1864>.
+* Add `useSecondaryLoadLinked` function to "src/mem/ruby/slicc_interface/ProtocolInfo.hh".
+This fixes a bug which was introduced after the removal of the `PROTOCOL_MESI_Two_Level` and `PROTOCOL_MESI_Three_Level` MACROs in v24.1.0.0.
+These MACROs were being used to infer if `Load_Linked` requests are sent to the Ruby protocol or not.
+The `useSecondaryLoadLinked` function has been introduced to specify this directly where needed.
+PR: <https://github.com/gem5/gem5/pull/1865>.
+
+# Version 24.1
+
+## User facing changes
+
+* The [behavior of the statistics `simInsts` and `simOps` has been changed](https://github.com/gem5/gem5/pull/1615).
+  * They now reset to zero when m5.stats.reset() is called.
+  * Previously, they incorrectly did not reset and would increase monotonically throughout the simulation.
+  * The statistics `hostInstRate` and `hostOpRate` are also affected by this change, as they are calculated using simInsts and simOps respectively.
+
+* Instances of kB, MB, and GB have been changed to KiB, MiB, and GiB for memory and cache sizes #1479
+  * A warning has also been added for usages of kB, MB, and GB.
+  * Please use KiB, MiB, and GiB in the future.
+
+* Random number generator is no longer shared across components. This may modify simulation results. #1534
+
+### gem5 Standard Library
+
+* SE mode has been added to X86Board, X86DemoBoard, and RiscvBoard #1702
+* ArmDemoBoard and RiscvDemoBoard have been added to the standard library #1478 #1490
+* The values in the X86DemoBoard have been modified to make it more similar to the other DemoBoards #1618
+
+### Prefetchers
+
+* The [behavior of the`StridePrefetcher` has been altered](https://github.com/gem5/gem5/pull/1449) as follows:
+  * The addresses used to compute the stride has been changed from word aligned addresses to cache line aligned addresses.
+  * It returns if the stride does not match, as opposed to issuing prefetching using the new stride --- the previous, incorrect behavior.
+  * Returns if the new stride is 0, indicating multiple reads from the same cache line.
+* Fix implementation of Best Offset Prefetcher #1403
+* Add SMS Prefetcher
+
+### Configuration scripts
+
+* Update the full system gem5 Standard Library example scripts to use Ubuntu 24.04 disk images #1491
+* Add RV32 option to configs/example/riscv/fs_linux.py #1312
+* Other updates to configs/example/riscv/fs_linux.py #1753
+
+### Multisim
+
+* simerr.txt and simout.txt now output into the correct sub-directory when -re is passed #1551
+
+### Compiler and OS support
+
+As of this release, gem5 supports Clang versions 14 through 18 and GCC versions 10 through 14.
+Other versions may work, but they are not regularly tested.
+
+### Multiple Ruby Protocols in a Single Build
+
+There are many developer facing / API changes to enable Ruby multiple protocols in a single build.
+The most notable changes are:
+
+* Removes the RubySlicc_interfaces.slicc file from the SLICC includes of
+every protocol.
+  * Changes required: If you have a custom protocol, you will need to remove the line `include "RubySlicc_interfaces.slicc"` from your .slicc file.
+* Updates the build configurations variables
+  * **USER FACING CHANGE**: The Ruby protocols in Kconfig have changed names (they are now the same case as the SLICC file names), and in addition,  So, after this commit, your build configurations need to be updated. You can do so by running `scons menuconfig <build dir>` and selecting the right ruby options. Alternatively, if you're using a `build_opts` file, you can run `scons defconfig build/<ISA> build_opts/<ISA>` which should update your config correctly.
+  * **USER FACING CHANGE**: The the "build_opts/ALL" build spec has been updated to include all Ruby protocols . As such, gem5 compilations of the "ALL" compilation target will include all gem5 Ruby protocols (previously just MESI_Two_Level).
+  * A "build_opts/NULL_ALL_RUBY" build spec has been added to include all Ruby protocols for a "NULL ISA" build . This is useful for testing Ruby protocols without the overhead of a full ISA and is used in gem5's traffic generator tests.
+  * A "build_opts/ARM_X86" build spec has been added due to a unique restriction in the "tests/gem5/fs/linux/arm" tests which requires a compilation of gem5 with both ARM and X86 and solely the MESI_Two_Level protocol.
+
+### Multiple RubySystem objects in a simulation
+
+Simulation configurations can now create multiple `RubySystem`s in the same simulation.
+Previously this was not possible due to `RubySystem` sharing variables across all `RubySystems` (e.g., cache line size).
+Allowing this feature requires developer facing changes for custom Ruby protocols.
+The most common changes will be:
+
+* Modify your custom protocol SLICC files, replace any instances of `RubySystem::foo()` with `m_ruby_system->foo()`, and recompile. `m_ruby_system` is automatically set by SLICC generated code.
+* If your custom protocol contains local `WriteMask` declarations (e.g., `WriteMask tmp_mask;`), modify the protocol so that `tmp_mask.setBlockSize(...)` is called. Use the block size of the `RubySystem` here (e.g., you can use `other_mask.getBlockSize()` or get block size from another object).
+* Modify your python configurations to assign the parameter `ruby_system` for the python classes `RubySequencer`, `RubyDirectoryMemory`, and `RubyPortProxy` or any derived classes. You will receive an error at the start of gem5 if this is not done.
+* If your python configuration uses a `RubyPrefetcher`, modify the configuration to assign the `block_size` parameter to the cache line size of the `RubySystem` the prefetcher is part of.
+
+The complete list of changes are:
+
+* `AbstractCacheEntry`, `ALUFreeListArray`, `DataBlock`, `Message`, `PerfectCacheMemory`, `PersistentTable`, `TBETable`, `TimerTable`, and `WriteMask` classes now require the cache line size to be explicitly set. This is handled automatically by the SLICC parser but must be done explicitly in C++ code by calling `setBlockSize()`.
+* `RubyPrefetcher` now requires `block_size` be assigned in python configurations.
+* `CacheMemory` now requires a pointer to the `RubySystem` to be set. This is handled automatically by the SLICC parser but must be done explicitly in C++ code by calling `setRubySystem()`.
+* `RubyDirectoryMemory`, `RubyPortProxy`, and `RubySequencer` now require a pointer to the `RubySystem` to be set by python configurations. If you have custom protocols using `DirectoryMemory` or derived classes from it, the `ruby_system` parameter must be set in the python configuration.
+* `ALUFreeListArray` and `BankedArray` now require a clock period to be set in C++ using `setClockPeriod()` and no longer require a pointer to the `RubySystem`.
+* You may no longer call `RubySystem::getBlockSizeBytes()`, `RubySystem::getBlockSizeBits()`, etc. You must have a pointer to the `RubySystem` you are a part of and call, for example, `ruby_system->getBlockSizeBytes()`.
+* `MessageBuffer::enqueue()` has two new parameters indicating if the `RubySystem` has randomization and warmup enabled. You must explicitly specify these values now.
+
+## ArmISA changes/improvements
+
+### Architectural extensions
+
+Architectural support for the following extensions:
+
+* FEAT_TTST
+* FEAT_XS
+
+### Bugfixes
+
+* Add support of AArch32 VRINTN/X/A/Z/M/P instructions
+* Add support of AArch32 VCVTA/P/N/M instructions
+* The following syscalls have been added in SE mode
+  * readv
+  * poll
+  * pread64
+  * pwrite64
+  * truncate64
+* The following syscalls have been fixed in SE mode when running on a 32bit HOST:
+  * getcwd
+  * lseek
+
+### CPU changes
+
+Before this release the Arm TLBs were using an hardcoded fully associative model with LRU replacement policy.
+The associativity and replacement policy of the Arm TLBs are now configurable with the IndexingPolicy and ReplacementPolicy classes by setting the indexing_policy and replacement_policy params.
+
+```python
+    indexing_policy = Param.TLBIndexingPolicy(
+        TLBSetAssociative(assoc=Parent.assoc, num_entries=Parent.size),
+        "Indexing policy of the TLB",
+    )
+    replacement_policy = Param.BaseReplacementPolicy(
+        LRURP(), "Replacement policy of the TLB"
+    )
+```
+
+While default behaviour is still LRU + FA, the L2 TLB in the ArmMMU (l2_shared) has been converted from being a fully associative structure into being a 5-way set associative.
+The default ArmMMU is therefore:
+
+```python
+    # L2 TLBs
+    l2_shared = ArmTLB(
+        entry_type="unified", size=1280, assoc=5, partial_levels=["L2"]
+    )
+
+    # L1 TLBs
+    itb = ArmTLB(entry_type="instruction", next_level=Parent.l2_shared)
+    dtb = ArmTLB(entry_type="data", next_level=Parent.l2_shared)
+```
+
+## AMBA CHI changes/improvements
+
+PR [1084](https://github.com/gem5/gem5/pull/1084) introduced two new CHI relevant classes.
+
+* The first one is the CHIGenericController. This is a purely C++ based / abstract interface of a Coherence Controller for ruby.
+It is meant to bypass SLICC and removes the limitation of using the gem5 Sequencer and associated data structures.
+* The second one is the CHI-TLM controller, which extends the aforementioned CHIGenericController. This is a bridge between the AMBA TLM 2.0 implementation of CHI [1](https://developer.arm.com/documentation/101459/latest) [2](https://developer.arm.com/Architectures/AMBA#Downloads) with the gem5 (ruby) one.
+
+In other words it translates AMBA CHI transactions into ruby messages (which are then forwarded to the MessageQueues)
+and vice versa.
+
+```text
+ARM::CHI::Payload,         CHIRequestMsg
+                     <-->  CHIDataMsg
+ARM::CHI::Phase            CHIResponseMsg
+                           CHIDataMsg
+```
+
+In this way it will be possible to connect external RNF models to the ruby interconnect via the CHI-TLM library
+
+## RISC-V ISA improvements
+
+* Use sign extend for all address generation #1316
+* Fix implicit int-to-float conversion in .isa files #1319
+* Implement Zcmp instructions #1432
+* Add support for riscv hardware probing syscall #1525
+* Add support for Zicbop extension #1710
+* Fix vector instruction assertion caused by speculative execution #1711
+
+## GPU model improvements
+
+The GPUFS model is now available in the standard library!
+There is a new `ViperBoard` in `gem5.prebuilt.viper`.
+This board is an initial implementation and will be improved in the next versions of gem5.
+There is an example script in `configs/example/gem5_library/x86-mi300x-gpu.py` that shows how to use the `ViperBoard`.
+See #1636.
+
+### Other GPU changes
+
+* Vega10 has been deprecated #1619
+* Replacement policy has been improved #1564
+* Swizzle multi-dword scratch requests now supported #1445
+* Many improvements to Vega implementation including memtime, SDWA, SDWAB, and DPP instructions #1350, #1378
+* Matrix Core Engines (AMD's equivalent to NVIDIA's TensorCores) now supported! #1248, #1700
+* Pannotia tests integrated into weekly tests #1584
+
+## Other Miscellaneous Changes
+
+### Other Ruby Related Changes
+
+* RubyHitMiss debug flag #1260
+* Prevent LL/SC livelock in MESI protocols #1399
+* Added files for [generating Sphinx documentation](https://github.com/gem5/gem5/pull/335) for the gem5 standard library.
+
+### Other
+
+* Looppoint analysis object #1419
+* Add global and local instruction trackers for raising instruction executed exit events with multi-core simulation #1433
+
+### Development
+
+* Removal of Gerrit Change-ID requirement #1486
+
 # Version 24.0.0.1
 
 **[HOTFIX]** Fixes a bug affecting the use of the `IndirectMemoryPrefetcher`, `SignaturePathPrefetcher`, `SignaturePathPrefetcherV2`, `STeMSPrefetcher`, and `PIFPrefetcher` SimObjects.
